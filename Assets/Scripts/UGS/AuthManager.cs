@@ -97,7 +97,7 @@ namespace Starlight.GamingService
             try
             {
                 await FriendsService.Instance.InitializeAsync();
-                SocialMenuUI.instance.idText.text = AuthenticationService.Instance.PlayerId;
+                SocialMenuUI.instance.activated = true;
             }
             catch (System.Exception)
             {

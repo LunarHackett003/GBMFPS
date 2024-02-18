@@ -1,3 +1,4 @@
+using Starlight.Connection;
 using Starlight.PlayerInteraction;
 using System.Collections;
 using System.Collections.Generic;
@@ -36,8 +37,22 @@ namespace Starlight.InputHandling
 
         public void GetSocialMenuInput(InputAction.CallbackContext context)
         {
-            if (context.performed)
+            if (context.performed && SocialMenuUI.instance.activated)
                 SocialMenuUI.instance.ToggleSocialMenu();
+        }
+        public void GetPlayerListInput(InputAction.CallbackContext context)
+        {
+            if (ConnectionManager.Instance.inGame)
+            {
+                if (context.performed)
+                {
+                    ConnectionManager.Instance.ToggleLobbyCG(true);
+                }
+                if (context.canceled)
+                {
+                    ConnectionManager.Instance.ToggleLobbyCG(false);
+                }
+            }
         }
 
     }
