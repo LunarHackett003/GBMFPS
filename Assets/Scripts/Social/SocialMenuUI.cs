@@ -25,6 +25,7 @@ namespace Starlight.PlayerInteraction
             }
         }
         [SerializeField] internal TextMeshProUGUI usernameText;
+        [SerializeField] internal TextMeshProUGUI idText;
         public void ToggleSocialMenu()
         {
             //Just in case its been updated, we also want to check the player name
@@ -48,6 +49,10 @@ namespace Starlight.PlayerInteraction
             menuActive = !menuActive;
             if (!menuActive)
                 socialMenu.gameObject.SetActive(false);
+        }
+        public void CopyPlayerToClipboard()
+        {
+            GUIUtility.systemCopyBuffer = idText.text;
         }
     }
 }

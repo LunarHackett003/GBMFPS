@@ -1,4 +1,5 @@
 using Eflatun.SceneReference;
+using Starlight.PlayerInteraction;
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -6,6 +7,7 @@ using TMPro;
 using Unity.Services.Authentication;
 using Unity.Services.Authentication.PlayerAccounts;
 using Unity.Services.Core;
+using Unity.Services.Friends;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -90,6 +92,19 @@ namespace Starlight.GamingService
             }
             usernameInputField.text = username;
             print($"session token exists:{AuthenticationService.Instance.SessionTokenExists}");
+
+            //Now that we've signed in, we need to initialise the Friends system
+            try
+            {
+                await FriendsService.Instance.InitializeAsync();
+                SocialMenuUI.instance.idText.text = AuthenticationService.Instance.PlayerId;
+            }
+            catch (System.Exception)
+            {
+                throw;
+            }
+
+
             await SceneManager.LoadSceneAsync(mainMenuScene.Name, LoadSceneMode.Single);
         }
         async void SignInWithUnity()
