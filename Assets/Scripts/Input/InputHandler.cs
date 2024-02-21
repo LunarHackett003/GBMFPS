@@ -14,6 +14,10 @@ namespace Starlight.InputHandling
     {
         internal static InputHandler instance;
         [SerializeField] internal PlayerInput input;
+        [SerializeField] internal Vector2 moveVec, lookVec;
+        [SerializeField] internal bool jumpInput, focusInput, fireInput, sprintInput, crouchInput;
+        [SerializeField] internal bool holdCrouch;
+        internal float moveMagnitude;
         private void Awake()
         {
             if (instance == null)
@@ -37,22 +41,64 @@ namespace Starlight.InputHandling
 
         public void GetSocialMenuInput(InputAction.CallbackContext context)
         {
-            if (context.performed && SocialMenuUI.instance.activated)
-                SocialMenuUI.instance.ToggleSocialMenu();
+            if (SocialMenuUI.instance)
+            {
+                if (context.performed && SocialMenuUI.instance.activated)
+                    SocialMenuUI.instance.ToggleSocialMenu();
+            }
         }
         public void GetPlayerListInput(InputAction.CallbackContext context)
         {
-            if (ConnectionManager.Instance.inGame)
+            if (ConnectionManager.Instance)
             {
-                if (context.performed)
+                if (ConnectionManager.Instance.inGame)
                 {
-                    ConnectionManager.Instance.ToggleLobbyCG(true);
-                }
-                if (context.canceled)
-                {
-                    ConnectionManager.Instance.ToggleLobbyCG(false);
+                    if (context.performed)
+                    {
+                        ConnectionManager.Instance.ToggleLobbyCG(true);
+                    }
+                    if (context.canceled)
+                    {
+                        ConnectionManager.Instance.ToggleLobbyCG(false);
+                    }
                 }
             }
+        }
+        public void GetJumpInput(InputAction.CallbackContext context)
+        {
+            jumpInput = context.performed;
+        }
+        public void GetFireInput(InputAction.CallbackContext context)
+        {
+            fireInput = context.performed || context.started;
+        }
+        public void GetSprintInput(InputAction.CallbackContext context)
+        {
+            sprintInput = context.performed || context.started;
+        }
+        public void GetFocusInput(InputAction.CallbackContext context)
+        {
+            focusInput = context.performed || context.started;
+        }
+        public void GetCrouchInput(InputAction.CallbackContext context)
+        {
+            if (holdCrouch)
+            {
+                crouchInput = context.performed || context.started;
+            }
+            else
+            {
+                if (context.performed)
+                    crouchInput = !crouchInput;
+            }
+        }
+        public void GetMoveInput(InputAction.CallbackContext context)
+        {
+            moveVec = context.ReadValue<Vector2>();
+        }
+        public void GetLookInput(InputAction.CallbackContext context)
+        {
+            lookVec = context.ReadValue<Vector2>();
         }
 
     }

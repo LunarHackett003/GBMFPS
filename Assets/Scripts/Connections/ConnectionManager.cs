@@ -17,6 +17,7 @@ namespace Starlight.Connection
         internal Lobby gameLobby;
 
         internal bool inLobby, inGame;
+        [SerializeField] internal bool localTesting;
 
         [SerializeField] CanvasGroup gameLobbyCG;
         private void Awake()
