@@ -17,6 +17,7 @@ namespace Starlight.InputHandling
         [SerializeField] internal Vector2 moveVec, lookVec;
         [SerializeField] internal bool jumpInput, focusInput, fireInput, sprintInput, crouchInput;
         [SerializeField] internal bool holdCrouch;
+        [SerializeField] internal bool forwardToMantle;
         internal float moveMagnitude;
         private void Awake()
         {
@@ -82,15 +83,7 @@ namespace Starlight.InputHandling
         }
         public void GetCrouchInput(InputAction.CallbackContext context)
         {
-            if (holdCrouch)
-            {
-                crouchInput = context.performed || context.started;
-            }
-            else
-            {
-                if (context.performed)
-                    crouchInput = !crouchInput;
-            }
+            crouchInput = context.performed || context.started;
         }
         public void GetMoveInput(InputAction.CallbackContext context)
         {
