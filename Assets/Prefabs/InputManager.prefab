@@ -54,6 +54,7 @@ MonoBehaviour:
   sprintInput: 0
   crouchInput: 0
   holdCrouch: 0
+  forwardToMantle: 0
 --- !u!114 &9116296323317205031
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -220,6 +221,22 @@ MonoBehaviour:
         m_CallState: 2
     m_ActionId: 24691e0f-957f-436a-bfdc-b33715f9e46a
     m_ActionName: 'Player/Sprint[/Keyboard/leftShift]'
+  - m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 5521410442011826548}
+        m_TargetAssemblyTypeName: Starlight.InputHandling.InputHandler, Assembly-CSharp
+        m_MethodName: GetFocusInput
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+    m_ActionId: 9cb44242-39f2-4b2d-8c15-d3d998b1d23f
+    m_ActionName: 'Player/Focus[/Mouse/rightButton]'
   m_NeverAutoSwitchControlSchemes: 0
   m_DefaultControlScheme: 
   m_DefaultActionMap: Player

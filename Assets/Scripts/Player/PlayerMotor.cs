@@ -6,7 +6,6 @@ using System.Collections;
 using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
-using UnityEngine.ProBuilder.MeshOperations;
 
 namespace Starlight.Player
 {
@@ -41,6 +40,10 @@ namespace Starlight.Player
         [SerializeField, Header("Recoil")] float globalRecoilMultiplier;
         [SerializeField] internal float recoilRotMultiply, recoilPosMultiply, recoilLerpSpeed, recoilDecaySpeed;
         internal Vector3 currentRecoilPos, currentRecoilRot, targetRecoilPos, targetRecoilRot;
+        [SerializeField, Header("Impact Recoil")] internal Vector3 targetImpactRecoil;
+        internal Vector3 impactdampvel;
+        [SerializeField] internal Vector3 currentImpactRecoil, currentImpactAngle;
+        [SerializeField] internal float impactImpulseMultiplier, impactPosMultiplier, impactAngleMultiplier, impactDecayTime, jumpRecoil, impactLerpSpeed;
 
         [SerializeField, Header("Movement Bobbing")] internal Transform bobbingTransform;
         [SerializeField] internal Vector3 bobPosSpeed, bobRotSpeed, bobPosMultiply, bobRotMultiply, currBobPos, currBobRot;
@@ -52,13 +55,22 @@ namespace Starlight.Player
         [SerializeField] internal Vector3 moveRotAdd;
 
         [SerializeField, Header("Focus")] internal CinemachineVirtualCamera playerCam;
-        [SerializeField] internal float currentFocus, focusSpeed, focusAimSlowCoefficient, focusZoomLevel;
+        [SerializeField] internal float currentFocus, focusSpeed, focusAimSlowCoefficient, focusZoomLevel, focusMoveSpeedMultiplier;
         [SerializeField] internal Vector2 focusFOV = new(80, 70);
 
         [SerializeField, Header("Wall Movement")] internal float wallrideForwardForce;
-        [SerializeField] internal Vector3 wallCheckSize, currentWallNormal;
-        [SerializeField] internal float wallrideStickForce, wallrideJumpForce, wallrideMaxTime, wallrideDownForce, currentWallrideTime, wallrideEnableAfterGroundedTime;
-        [SerializeField] internal bool canWallride, isWallriding, wallOnLeftSide;
+        [SerializeField] internal Vector3 wallCheckOrigin, wallCheckSize, currentWallNormal;
+        [SerializeField] internal float wallrideCheckDistance, wallrideStickForce, wallrideJumpForce, wallrideMaxTime, 
+            wallrideDownForce, currentWallrideTime, wallrideEnableAfterGroundedTime, wallrideReEnableTime, wallrideCurrentReEnableTime, wallrideTurnSpeed, wallrideClimbStartVelocity;
+        [SerializeField] internal bool canWallride, isWallriding;
+        [SerializeField] internal WallrideSide wallrideSide;
+        internal enum WallrideSide
+        {
+            none = 0,
+            left = 1,
+            right = 2,
+            front = 4
+        }
         [SerializeField, Header("Wall Movement - Mantling")] internal float mantleSpeed;
         [SerializeField] internal float mantleCheckDistance, mantleStandHeight, mantlePreventHeight, mantleProgress, mantleRetryTime, mantleMinHeight;
         internal float currentMantleRetryTime;
@@ -68,7 +80,7 @@ namespace Starlight.Player
         [SerializeField] internal bool mantling;
         [SerializeField, Header("Other Movement")] internal float jumpUpwardForce;
         [SerializeField] internal bool doubleJumped, sliding, sprinting;
-        [SerializeField] internal float slideInitialForce, slideDrag, slideControlForce, slideMinimumVelocity,jumpLateralForce;
+        [SerializeField] internal float slideInitialForce, slideDrag, slideControlForce, slideMinimumVelocity,jumpLateralForce, slideTilt, slideTiltSpeed, currentSlideTilt, slideAdditiveFOV;
         [SerializeField] internal float sprintForce;
 
         [SerializeField, Header("Crouching")] internal float crouchHeight;
@@ -147,7 +159,7 @@ namespace Starlight.Player
             aimRecoilInfluence = currentRecoilRot * aimRecoilInfluence;
             lookAngle.y = Mathf.Clamp(lookAngle.y + aimRecoilInfluence.x, lookPitchClamp.x, lookPitchClamp.y);
             lookAngleDelta = (oldLookAngle - lookAngle);
-            aimRotationTransform.localRotation = Quaternion.Euler(lookAngle.y, aimRecoilInfluence.y, 0);
+            aimRotationTransform.localRotation = Quaternion.Euler(lookAngle.y, aimRecoilInfluence.y, Mathf.Lerp(0, slideTilt, currentSlideTilt));
             transform.localRotation = Quaternion.Euler(0, lookAngle.x, 0);
             lookAngle.x %= 360;
             oldLookAngle = lookAngle;
@@ -156,17 +168,30 @@ namespace Starlight.Player
             lookSwayPosM = lookAngleDelta.ScaleReturn(lookSwayPosScale * aimSwayPosMultiply).ClampThis(-maxAimSway, maxAimSway);
             lookSwayRotM = new Vector3(lookAngleDelta.y, lookAngleDelta.x, lookAngleDelta.y).ScaleReturn(lookSwayRotScale * aimSwayRotMultiply).ClampThis(-maxAimSway, maxAimSway);
 
+
+            targetImpactRecoil = Vector3.SmoothDamp(targetImpactRecoil, Vector3.zero, ref impactdampvel, impactDecayTime * targetImpactRecoil.magnitude);
+            currentImpactRecoil = Vector3.Lerp(currentImpactRecoil, targetImpactRecoil, Time.smoothDeltaTime * impactLerpSpeed);
+            Vector3 angularImpactRecoil = new Vector3(currentImpactRecoil.y, currentImpactRecoil.x, 0) * impactAngleMultiplier;
+            playerCam.transform.SetLocalPositionAndRotation(currentImpactRecoil * impactPosMultiplier, Quaternion.Euler(angularImpactRecoil));
+
+
             currentAimSwayPos = swayFocusLerp * Vector3.Lerp(currentAimSwayPos, lookSwayPosM, Time.smoothDeltaTime * aimSwaySpeed);
             currentAimSwayRot = swayFocusLerp * Vector3.Lerp(currentAimSwayRot, lookSwayRotM, Time.smoothDeltaTime * aimSwaySpeed);
-            bobbingTransform.SetLocalPositionAndRotation(currBobPos + currentAimSwayPos, Quaternion.Euler(currBobRot + currentAimSwayRot));
+            bobbingTransform.localPosition = currBobPos + currentAimSwayPos;
+            Focus();
+            bobbingTransform.localRotation = Quaternion.Euler(currBobRot + currentAimSwayRot);
+
+
         }
 
         void InputLogic()
         {
+            movementDamped = Vector2.SmoothDamp(movementDamped, InputHandler.instance.moveVec, ref moveDampVelocity, movementDampTime);
+            dampedMoveMagnitude = movementDamped.magnitude;
+
             //Are we sprinting?
             sprinting = InputHandler.instance.sprintInput && moveState == MovementState.onFoot;
             //Are we crouching?
-            
             if (InputHandler.instance.holdCrouch)
             {
                 crouching = InputHandler.instance.crouchInput;
@@ -177,15 +202,22 @@ namespace Starlight.Player
             }
             else
             {
-                if (!crouchpressed && InputHandler.instance.crouchInput)
+                if (!crouchpressed)
                 {
-                    crouching = !crouching;
-                    Crouch();
+                    if (InputHandler.instance.crouchInput) {
+                        crouching = !crouching;
+                        if (crouching)
+                            Crouch();
+                    }
                 }
             }
-            crouchpressed = (crouching == true);
+            crouchpressed = (InputHandler.instance.crouchInput == true);
 
-            
+            currentFocus += Time.fixedDeltaTime * focusSpeed * (InputHandler.instance.focusInput ? 1 : -1);
+            currentFocus = Mathf.Clamp01(currentFocus);
+
+            if (InputHandler.instance.focusInput)
+                sprinting = false;
             if (!sliding)
             {
                 //If we're crouching before we sprint, we want to stop crouching and start sprinting, which means we need to stand up.
@@ -220,7 +252,6 @@ namespace Starlight.Player
                     if (sprinting)
                     {
                         Slide();
-                        InputHandler.instance.crouchInput = false;
                     }
                     break;
                 default:
@@ -238,6 +269,7 @@ namespace Starlight.Player
             crouchTransform.localPosition = new Vector3(0, Mathf.Lerp(standHeight, crouchHeight, crouchLerp), 0);
             capsule.height = Mathf.Lerp(standHeight, crouchHeight, crouchLerp) + capsuleHeadHeightBuffer;
             capsule.center = new Vector3(0, (capsule.height - capsuleHeadHeightBuffer) / 2, 0);
+            currentSlideTilt = Mathf.Clamp01(Time.fixedDeltaTime * slideTiltSpeed * (sliding ? 1 : -1));
 
             if (InputHandler.instance.jumpInput)
             {
@@ -283,6 +315,7 @@ namespace Starlight.Player
                     {
                         sliding = false;
                         crouching = true;
+                        InputHandler.instance.crouchInput = true;
                     }
                     break;
                 case MovementState.mantling:
@@ -291,6 +324,27 @@ namespace Starlight.Player
                     break;
             }
             rb.drag = sliding ? slideDrag : (grounded ? playerDrag.x : playerDrag.y);
+            rb.useGravity = !isWallriding;
+            if (isWallriding)
+            {
+                currentWallrideTime += Time.fixedDeltaTime;
+                if(currentWallrideTime > wallrideMaxTime)
+                {
+                    isWallriding = false;
+                    StartCoroutine(WallrideDelay(wallrideReEnableTime));
+                }
+            }
+            else
+            {
+                currentWallrideTime = 0;
+            }
+        }
+        void Focus()
+        {
+
+            playerCam.m_Lens.FieldOfView = Mathf.Lerp(focusFOV.x + Mathf.Lerp(0, slideAdditiveFOV, currentSlideTilt), focusFOV.y, currentFocus);
+            focusPositionReceiver.position = Vector3.Lerp(focusPositionReceiver.parent.position, focusPositionTarget.position, currentFocus);
+            focusPositionReceiver.localPosition -= currBobPos + currentAimSwayPos;
 
         }
         void CheckGround()
@@ -303,10 +357,10 @@ namespace Starlight.Player
         }
         void Movement()
         {
-            movementDamped = Vector2.SmoothDamp(movementDamped, InputHandler.instance.moveVec, ref moveDampVelocity, movementDampTime);
-            dampedMoveMagnitude = movementDamped.magnitude;
-            Vector3 moveVec = (sprinting ? sprintForce : Mathf.Lerp(moveForceMultiplier, crouchMoveSpeedMultiplier, crouchLerp))
-                * new Vector3() { x = movementDamped.x, z = movementDamped.y }.ProjectOntoPlane(grounded ? groundNormal : Vector3.up);
+
+
+            Vector3 moveVec = (sprinting ? sprintForce : Mathf.Lerp(moveForceMultiplier, crouchMoveSpeedMultiplier, crouchLerp)) *
+                Mathf.Lerp(1, focusMoveSpeedMultiplier, currentFocus) * new Vector3() { x = movementDamped.x, y=0, z = movementDamped.y }.ProjectOntoPlane(grounded ? groundNormal : Vector3.up);
             if (rb)
             {
                 rb.AddForce(transform.rotation * moveVec * (grounded ? moveForceMultiplier : airControlForce));
@@ -317,11 +371,12 @@ namespace Starlight.Player
             sliding = true;
             crouching = false;
             moveState = MovementState.sliding;
+            InputHandler.instance.crouchInput = false;
             rb.AddForce(transform.forward * slideInitialForce);
         }
         void TryMantle()
         {
-            if (currentMantleRetryTime <= 0 && (InputHandler.instance.forwardToMantle ? InputHandler.instance.moveVec.y > 0.5f : InputHandler.instance.jumpInput))
+            if (currentMantleRetryTime <= 0 && ((InputHandler.instance.forwardToMantle ? InputHandler.instance.moveVec.y > 0.5f : InputHandler.instance.jumpInput) || isWallriding))
             {
                 print("checking mantle");
                 if (Physics.Raycast(transform.TransformPoint(mantleLowerCastPosition), transform.forward, out RaycastHit hit, mantleCheckDistance, groundCheckLayermask))
@@ -340,7 +395,7 @@ namespace Starlight.Player
                         return;
                     print("mantle check 3");
                     //The surface we hit here is walkable, so we need to check just how much space we have above that point.
-                    if (Physics.Raycast(hit.point, Vector3.up, out RaycastHit hit2, mantlePreventHeight, groundCheckLayermask))
+                    if (Physics.Raycast(hit.point + (Vector3.down * 0.1f), Vector3.up, out RaycastHit hit2, mantlePreventHeight, groundCheckLayermask))
                     {
                         //We've hit something here, so we need to make sure that we've got enough space to actually climb up without hitting our head.
                         //If the hit distance is less than our crouch distance, we'll cancel the mantle as we won't have the space to stand or crouch once we climb.
@@ -382,10 +437,78 @@ namespace Starlight.Player
             //Now we've checke if we can mantle, we stop this method here because we can't mantle AND Wallride at the same time.
             if (mantling)
                 return;
+            print("checking wallride");
+            //We're not mantling so lets try and wallride.
+            //First check forward wallride. If we are wallriding "into" a wall, we'll start to climb it
+            //We want to box cast in front of us first.
+            print("checking front");
+            if (WallCast(transform.forward, out RaycastHit hit))
+            {
+                wallrideSide = WallrideSide.front;
+                if (!isWallriding)
+                {
+                    rb.velocity = new Vector3(rb.velocity.x, wallrideClimbStartVelocity, rb.velocity.z);
+                }
+                rb.AddForce(movementDamped.y * wallrideForwardForce * transform.up + (-currentWallNormal * wallrideStickForce));
+                isWallriding = true;
+                print("hit front");
+                return;
+            }
+            print("checking left");
+            if (WallCast(-transform.right, out hit))
+            {
+                wallrideSide = WallrideSide.left;
+                rb.AddForce(movementDamped.y * wallrideForwardForce * transform.forward + (-currentWallNormal * wallrideStickForce));
+                rb.velocity = new Vector3(rb.velocity.x, rb.velocity.y * 0.1f, rb.velocity.z);
+                isWallriding = true;
+                print("hit left");
+                return;
+            }
+            print("checking right");
 
+            if (WallCast(transform.right, out hit))
+            {
+                wallrideSide = WallrideSide.right;
+                rb.AddForce(movementDamped.y * wallrideForwardForce * transform.forward + (-currentWallNormal * wallrideStickForce));
+                rb.velocity = new Vector3(rb.velocity.x, rb.velocity.y * 0.1f, rb.velocity.z);
+                isWallriding = true;
+                print("hit right");
+
+                return;
+            }
+            else
+            {
+                if (isWallriding)
+                {
+                    StartCoroutine(WallrideDelay(wallrideCurrentReEnableTime));
+                }
+                isWallriding = false;
+            }
 
         }
-
+        bool WallCast(Vector3 direction, out RaycastHit hit)
+        {
+            if (Physics.BoxCast(transform.TransformPoint(wallCheckOrigin), wallCheckSize / 2, direction, out hit, transform.rotation, wallrideCheckDistance, groundCheckLayermask))
+            {
+                //If the wall is too steep/too shallow, we can't wallride it.
+                if (Vector3.Dot(-hit.normal, direction) < 0.9f || (wallrideCurrentReEnableTime > 0 && hit.normal == currentWallNormal))
+                    return false;
+                currentWallNormal = hit.normal;
+                return true;
+            }
+            return false;
+        }
+        IEnumerator WallrideDelay(float time)
+        {
+            isWallriding = false;
+            rb.AddForce(currentWallNormal * wallrideJumpForce);
+            wallrideCurrentReEnableTime = time;
+            while (wallrideCurrentReEnableTime > 0)
+            {
+                wallrideCurrentReEnableTime -= Time.fixedDeltaTime;
+                yield return new WaitForFixedUpdate();
+            }
+        }
         IEnumerator MantleLerp()
         {
             float time = 0;
@@ -420,17 +543,20 @@ namespace Starlight.Player
             {
                 case MovementState.onFoot:
                     jumpVec = transform.TransformDirection(new Vector3(movementDamped.x * jumpLateralForce, jumpUpwardForce, movementDamped.y * jumpLateralForce));
+                    StartCoroutine(WallrideDelay(wallrideEnableAfterGroundedTime));
                     break;
                 case MovementState.airborne:
                     jumpVec = transform.TransformDirection(new Vector3(movementDamped.x * jumpLateralForce, jumpUpwardForce, movementDamped.y * jumpLateralForce));
                     break;
                 case MovementState.wallriding:
-                    jumpVec = (-currentWallNormal + Vector3.up + playerCam.transform.forward).normalized * wallrideJumpForce;
-
+                    jumpVec = (currentWallNormal + Vector3.up + playerCam.transform.forward).normalized * wallrideJumpForce;
+                    StartCoroutine(WallrideDelay(wallrideReEnableTime));
+                    isWallriding = false;
                     break;
                 case MovementState.sliding:
                     jumpVec = transform.TransformDirection(new Vector3(movementDamped.x * jumpLateralForce, jumpUpwardForce, movementDamped.y * jumpLateralForce));
                     sliding = false;
+                    StartCoroutine(WallrideDelay(wallrideEnableAfterGroundedTime));
                     break;
                 case MovementState.mantling:
                     jumpVec = (-transform.forward + Vector3.up) * wallrideJumpForce;
@@ -443,7 +569,7 @@ namespace Starlight.Player
             }
 
             rb.AddForce(jumpVec, ForceMode.Impulse);
-            
+            targetImpactRecoil += jumpVec * jumpRecoil;
 
         }
         private void OnDrawGizmosSelected()
@@ -456,8 +582,20 @@ namespace Starlight.Player
             Gizmos.DrawRay(transform.TransformPoint(mantleLowerCastPosition), transform.forward * mantleCheckDistance);
 
             Gizmos.DrawRay(transform.TransformPoint(mantleGroundCheckPosition), Vector3.down * 1.5f);
-
-
+            Vector3 pos = transform.TransformPoint(wallCheckOrigin);
+            Gizmos.color = Color.green;
+            Gizmos.DrawWireCube(pos, wallCheckSize);
+            Gizmos.DrawWireCube(pos + transform.right * wallrideCheckDistance, wallCheckSize);
+            Gizmos.DrawWireCube(pos + transform.forward * wallrideCheckDistance, wallCheckSize);
+            Gizmos.DrawWireCube(pos -transform.right * wallrideCheckDistance, wallCheckSize);
+        }
+        private void OnCollisionEnter(Collision collision)
+        {
+            if (crouching && Vector3.Dot(collision.impulse.normalized, groundNormal) > 0.5f )
+            {
+                Slide();
+            }
+            targetImpactRecoil += playerCam.transform.TransformDirection(collision.impulse * impactImpulseMultiplier);
         }
     }
 }
