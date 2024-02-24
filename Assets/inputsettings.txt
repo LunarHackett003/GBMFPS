@@ -1,0 +1,1 @@
+{"lookSpeed":{"x":5.0,"y":-5.0},"holdCrouch":true}

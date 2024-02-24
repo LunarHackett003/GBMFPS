@@ -17,8 +17,8 @@ namespace Starlight.Player
 
         [SerializeField] internal Rigidbody rb;
 
-        [SerializeField, Header("Aim")] internal Vector2 lookSpeed;
-        [SerializeField] internal Vector2 lookAngle, lookPitchClamp;
+        [SerializeField, Header("Aim")] internal Vector2 lookAngle;
+        [SerializeField]internal Vector2 lookPitchClamp;
         [SerializeField] internal Vector2 aimRecoilInfluence;
 
         [SerializeField, Header("Movement")] internal Vector2 movementDamped;
@@ -119,6 +119,9 @@ namespace Starlight.Player
         internal float swayFocusLerp;
         internal bool myCrouchInput;
 
+        public NetworkVariable<float> capsuleHeight = new(writePerm: NetworkVariableWritePermission.Owner);
+        public NetworkVariable<float> capsuleCentre = new(writePerm: NetworkVariableWritePermission.Owner);
+
         bool jumppressed = false;
         [SerializeField] bool crouchpressed = false;
         bool sprintpressed = false;
@@ -155,7 +158,7 @@ namespace Starlight.Player
             currBobRot = Vector3.Lerp(currBobRot, (Vector3)(rotAngle * bobRotMult).ScaleReturn(bobRotMultiply) + moveAddRot, Time.smoothDeltaTime * Mathf.Lerp(bobRotLerpSpeedMoving.x, bobRotLerpSpeedMoving.y, dampedMoveMagnitude)) * focusLerp;
 
             //Then we do the aiming stuff so the player can rotate
-            lookAngle += (Time.smoothDeltaTime * lookSpeed * InputHandler.instance.lookVec) / Mathf.Lerp(1, 1 + (focusZoomLevel * focusAimSlowCoefficient), currentFocus);
+            lookAngle += InputHandler.instance.paused ? Vector2.zero : Time.smoothDeltaTime * InputHandler.instance.lookSpeed * InputHandler.instance.lookVec / Mathf.Lerp(1, 1 + (focusZoomLevel * focusAimSlowCoefficient), currentFocus);
             aimRecoilInfluence = currentRecoilRot * aimRecoilInfluence;
             lookAngle.y = Mathf.Clamp(lookAngle.y + aimRecoilInfluence.x, lookPitchClamp.x, lookPitchClamp.y);
             lookAngleDelta = (oldLookAngle - lookAngle);
@@ -186,7 +189,7 @@ namespace Starlight.Player
 
         void InputLogic()
         {
-            movementDamped = Vector2.SmoothDamp(movementDamped, InputHandler.instance.moveVec, ref moveDampVelocity, movementDampTime);
+            movementDamped = Vector2.SmoothDamp(movementDamped, InputHandler.instance.paused ? Vector2.zero : InputHandler.instance.moveVec, ref moveDampVelocity, movementDampTime);
             dampedMoveMagnitude = movementDamped.magnitude;
 
             //Are we sprinting?
@@ -195,7 +198,7 @@ namespace Starlight.Player
             if (InputHandler.instance.holdCrouch)
             {
                 crouching = InputHandler.instance.crouchInput;
-                if (!crouchpressed)
+                if (!crouchpressed && crouching)
                 {
                     Crouch();
                 }
@@ -230,7 +233,6 @@ namespace Starlight.Player
         }
         void Crouch()
         {
-            crouching = true;
             switch (moveState)
             {
                 case MovementState.airborne:
@@ -261,7 +263,11 @@ namespace Starlight.Player
         private void FixedUpdate()
         {
             if (isNotMine)
+            {
+                capsule.height = capsuleHeight.Value;
+                capsule.center = new Vector3(0, capsuleCentre.Value, 0);
                 return;
+            }
             CheckGround();
             InputLogic();
             rb.isKinematic = mantling;
@@ -270,8 +276,11 @@ namespace Starlight.Player
             capsule.height = Mathf.Lerp(standHeight, crouchHeight, crouchLerp) + capsuleHeadHeightBuffer;
             capsule.center = new Vector3(0, (capsule.height - capsuleHeadHeightBuffer) / 2, 0);
             currentSlideTilt = Mathf.Clamp01(Time.fixedDeltaTime * slideTiltSpeed * (sliding ? 1 : -1));
-
-            if (InputHandler.instance.jumpInput)
+            if (capsuleHeight.Value != capsule.height && capsuleCentre.Value != capsule.center.y) {
+                capsuleHeight.Value = capsule.height;
+                capsuleCentre.Value = capsule.center.y;
+                    }
+            if (InputHandler.instance.jumpInput && !InputHandler.instance.paused)
             {
                 if (!jumppressed)
                 {

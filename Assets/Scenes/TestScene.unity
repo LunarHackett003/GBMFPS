@@ -518,6 +518,41 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 2492893171161373897, guid: 0a04426f2457d1b448a9f032e20836e2,
+        type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2492893171161373897, guid: 0a04426f2457d1b448a9f032e20836e2,
+        type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Mode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2492893171161373897, guid: 0a04426f2457d1b448a9f032e20836e2,
+        type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 39597249}
+    - target: {fileID: 2492893171161373897, guid: 0a04426f2457d1b448a9f032e20836e2,
+        type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 2492893171161373897, guid: 0a04426f2457d1b448a9f032e20836e2,
+        type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: Unpause
+      objectReference: {fileID: 0}
+    - target: {fileID: 2492893171161373897, guid: 0a04426f2457d1b448a9f032e20836e2,
+        type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
+      value: Starlight.InputHandling.InputHandler, Assembly-CSharp
+      objectReference: {fileID: 0}
+    - target: {fileID: 2492893171161373897, guid: 0a04426f2457d1b448a9f032e20836e2,
+        type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: UnityEngine.Object, UnityEngine
+      objectReference: {fileID: 0}
     - target: {fileID: 3097167369144534586, guid: 0a04426f2457d1b448a9f032e20836e2,
         type: 3}
       propertyPath: m_Name
@@ -528,6 +563,18 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 0a04426f2457d1b448a9f032e20836e2, type: 3}
+--- !u!114 &39597249 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 5521410442011826548, guid: 0a04426f2457d1b448a9f032e20836e2,
+    type: 3}
+  m_PrefabInstance: {fileID: 39597248}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6071da48bcfb0d14dac04610b26a8f2f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!43 &83945207
 Mesh:
   m_ObjectHideFlags: 0
@@ -1534,6 +1581,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 259052133}
+  - component: {fileID: 259052134}
   m_Layer: 6
   m_Name: Head
   m_TagString: Untagged
@@ -1559,6 +1607,37 @@ Transform:
   - {fileID: 2014748903}
   m_Father: {fileID: 211732260}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &259052134
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 259052132}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ee20d651fc1668c4a92800e89b298a6a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  UseUnreliableDeltas: 0
+  SyncPositionX: 0
+  SyncPositionY: 1
+  SyncPositionZ: 0
+  SyncRotAngleX: 0
+  SyncRotAngleY: 1
+  SyncRotAngleZ: 0
+  SyncScaleX: 0
+  SyncScaleY: 0
+  SyncScaleZ: 0
+  PositionThreshold: 0.001
+  RotAngleThreshold: 0.01
+  ScaleThreshold: 0.01
+  UseQuaternionSynchronization: 0
+  UseQuaternionCompression: 0
+  UseHalfFloatPrecision: 0
+  InLocalSpace: 0
+  Interpolate: 1
+  SlerpPosition: 0
 --- !u!43 &260704613
 Mesh:
   m_ObjectHideFlags: 0
@@ -11974,6 +12053,8 @@ GameObject:
   - component: {fileID: 2076271086}
   - component: {fileID: 2076271085}
   - component: {fileID: 2076271087}
+  - component: {fileID: 2076271089}
+  - component: {fileID: 2076271088}
   m_Layer: 6
   m_Name: Player
   m_TagString: Untagged
@@ -12041,11 +12122,10 @@ MonoBehaviour:
   aimRotationTransform: {fileID: 259052133}
   aimRotationAnchor: {fileID: 0}
   rb: {fileID: 2076271087}
-  lookSpeed: {x: 15, y: -15}
   lookAngle: {x: 0, y: 0}
   lookPitchClamp: {x: -80, y: 80}
   aimRecoilInfluence: {x: 0, y: 0}
-  movementDamped: {x: -1e-45, y: 2.874063e-39}
+  movementDamped: {x: 1e-45, y: 1e-45}
   movementDampTime: 0.1
   moveForceMultiplier: 5
   airControlForce: 0.75
@@ -12062,7 +12142,7 @@ MonoBehaviour:
   aimSwaySpeed: 4
   aimSwayRotMultiply: 5
   aimSwayPosMultiply: 0.2
-  aimSwayFocusMultiply: 1
+  aimSwayFocusMultiply: 0.95
   oldLookAngle: {x: 0, y: 0}
   lookAngleDelta: {x: 0, y: 0}
   currentAimSwayPos: {x: 0, y: 0, z: 0}
@@ -12076,11 +12156,11 @@ MonoBehaviour:
   recoilLerpSpeed: 0
   recoilDecaySpeed: 0
   targetImpactRecoil: {x: 0, y: 0, z: 0}
-  currentImpactRecoil: {x: 2.1544037e-10, y: -0.0000000012201437, z: 1.9989418e-10}
+  currentImpactRecoil: {x: 0.0000000023579005, y: 0.000000003739058, z: -0.00000000311276}
   currentImpactAngle: {x: 0, y: 0, z: 0}
   impactImpulseMultiplier: -0.12
   impactPosMultiplier: 0.2
-  impactAngleMultiplier: -10
+  impactAngleMultiplier: -2
   impactDecayTime: 0.2
   jumpRecoil: 0.2
   impactLerpSpeed: 2
@@ -12089,17 +12169,17 @@ MonoBehaviour:
   bobRotSpeed: {x: 8, y: 4, z: 1}
   bobPosMultiply: {x: 0.06, y: 0.06, z: 0.06}
   bobRotMultiply: {x: 2, y: 2, z: 3}
-  currBobPos: {x: -0.0010890485, y: -0.0007775183, z: 1.7356811e-19}
-  currBobRot: {x: -0.15109223, y: 0.08342377, z: 1e-45}
+  currBobPos: {x: 0.000523403, y: 0.0007390851, z: 0}
+  currBobRot: {x: -0.15637691, y: -0.1797121, z: -1e-45}
   bobPosLerpSpeedMoving: {x: 8, y: 15}
   bobRotLerpSpeedMoving: {x: 8, y: 15}
   bobPosScaleMoving: {x: 0.02, y: 0.1}
   bobRotScaleMoving: {x: 0.1, y: 0.5}
   bobPosSpeedMoving: {x: 0.1, y: 2}
   bobRotSpeedMoving: {x: 0.1, y: 2}
-  bobFocusMultiply: 1
-  posTime: 0
-  rotTime: 0
+  bobFocusMultiply: 0.9
+  posTime: 346.2595
+  rotTime: 346.2595
   movePosAdd: {x: 0.01, y: 0.02, z: 0.2}
   moveRotAdd: {x: 1, y: 2, z: -1}
   playerCam: {fileID: 1995739586}
@@ -12112,7 +12192,7 @@ MonoBehaviour:
   wallrideForwardForce: 5
   wallCheckOrigin: {x: 0, y: 0, z: 0}
   wallCheckSize: {x: 0.3, y: 1.5, z: 0.3}
-  currentWallNormal: {x: 1, y: 0, z: 0.00000004656612}
+  currentWallNormal: {x: 0.00000007636845, y: 0.0000028610211, z: -1}
   wallrideCheckDistance: 0.65
   wallrideStickForce: 15
   wallrideJumpForce: 5
@@ -12194,8 +12274,8 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  mantleStartPos: {x: 1.6535059, y: 16.503721, z: 21.500021}
-  mantleEndPos: {x: 1.9350439, y: 18.51002, z: 22.615026}
+  mantleStartPos: {x: -9.202027, y: 7.8380117, z: 9.409195}
+  mantleEndPos: {x: -8.872236, y: 8.51, z: 10.510893}
   mantleEndPosOffset: {x: 0, y: 0.51, z: 0}
   mantling: 0
   jumpUpwardForce: 6.5
@@ -12222,6 +12302,10 @@ MonoBehaviour:
   crouchTransform: {fileID: 211732260}
   capsule: {fileID: 2076271081}
   moveState: 0
+  capsuleHeight:
+    m_InternalValue: 0
+  capsuleCentre:
+    m_InternalValue: 0
   crouchpressed: 0
 --- !u!114 &2076271086
 MonoBehaviour:
@@ -12271,6 +12355,49 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 112
   m_CollisionDetection: 0
+--- !u!114 &2076271088
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2076271080}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f6c0be61502bb534f922ebb746851216, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &2076271089
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2076271080}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ee20d651fc1668c4a92800e89b298a6a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  UseUnreliableDeltas: 0
+  SyncPositionX: 1
+  SyncPositionY: 1
+  SyncPositionZ: 1
+  SyncRotAngleX: 0
+  SyncRotAngleY: 1
+  SyncRotAngleZ: 0
+  SyncScaleX: 0
+  SyncScaleY: 0
+  SyncScaleZ: 0
+  PositionThreshold: 0.001
+  RotAngleThreshold: 0.01
+  ScaleThreshold: 0.01
+  UseQuaternionSynchronization: 0
+  UseQuaternionCompression: 0
+  UseHalfFloatPrecision: 0
+  InLocalSpace: 0
+  Interpolate: 1
+  SlerpPosition: 0
 --- !u!1 &2085057389
 GameObject:
   m_ObjectHideFlags: 0
