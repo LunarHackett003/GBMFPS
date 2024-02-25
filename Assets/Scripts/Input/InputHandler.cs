@@ -4,6 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using TMPro;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -30,6 +31,7 @@ namespace Starlight.InputHandling
         public string filepath;
         [SerializeField] internal Slider xSensSlider, ySensSlider;
         [SerializeField] internal Toggle holdCrouchToggle;
+        [SerializeField] internal TextMeshProUGUI joinCodeDisplay;
 
         public class Settings
         {
@@ -88,6 +90,14 @@ namespace Starlight.InputHandling
             sw.Write(JsonUtility.ToJson(mySaveSettings));
             sw.Close();
             sw.Dispose();
+        }
+        private void FixedUpdate()
+        {
+            if (!ConnectionManager.Instance.inGame)
+            {
+                Cursor.visible = true;
+                Cursor.lockState = CursorLockMode.Confined;
+            }
         }
         private void SceneManager_sceneLoaded(Scene arg0, LoadSceneMode arg1)
         {
@@ -180,6 +190,11 @@ namespace Starlight.InputHandling
         public void SetCrouchHold(bool value)
         {
             holdCrouch = value;
+        }
+        public void TryQuitGame()
+        {
+            ConnectionManager.Instance.TryQuitGame();
+            Unpause();
         }
     }
 }

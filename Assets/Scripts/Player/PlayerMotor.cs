@@ -1,6 +1,7 @@
 using Cinemachine;
 using Cinemachine.Utility;
 using Starlight.Connection;
+using Starlight.Data;
 using Starlight.InputHandling;
 using System.Collections;
 using System.Collections.Generic;
@@ -98,12 +99,10 @@ namespace Starlight.Player
             mantling = 8
         }
         [SerializeField] internal MovementState moveState;
-        bool CheckOwnership { get { return (!(IsOwner || (!ConnectionManager.Instance || ConnectionManager.Instance.localTesting))); } }
+        bool CheckOwnership { get { return IsOwner || !ConnectionManager.Instance || ConnectionManager.Instance.localTesting; } }
         private void Awake()
         {
-            isNotMine = CheckOwnership;
-            Cursor.visible = false;
-            Cursor.lockState = CursorLockMode.Locked;
+
         }
         private void LateUpdate()
         {
@@ -125,6 +124,35 @@ namespace Starlight.Player
         bool jumppressed = false;
         [SerializeField] bool crouchpressed = false;
         bool sprintpressed = false;
+
+        private void OnLevelWasLoaded(int level)
+        {
+            if (IsOwner)
+            {
+                var sgd = FindAnyObjectByType<SceneGameData>();
+                transform.position = sgd.spawnPoints[Random.Range(0, sgd.spawnPoints.Count)].position;
+            }
+        }
+
+        public override void OnNetworkSpawn()
+        {
+            isNotMine = !IsOwner;
+            if (IsOwner)
+            {
+
+            }
+            else
+            {
+                playerCam.enabled = false;
+                foreach (var item in transform.GetComponentsInChildren<GameObject>())
+                {
+                    item.layer = LayerMask.NameToLayer(ConnectionManager.Instance.remotePlayerLayer);
+                }
+            }
+
+            base.OnNetworkSpawn();
+        }
+
         void ViewDynamics()
         {
 
@@ -275,7 +303,7 @@ namespace Starlight.Player
             crouchTransform.localPosition = new Vector3(0, Mathf.Lerp(standHeight, crouchHeight, crouchLerp), 0);
             capsule.height = Mathf.Lerp(standHeight, crouchHeight, crouchLerp) + capsuleHeadHeightBuffer;
             capsule.center = new Vector3(0, (capsule.height - capsuleHeadHeightBuffer) / 2, 0);
-            currentSlideTilt = Mathf.Clamp01(Time.fixedDeltaTime * slideTiltSpeed * (sliding ? 1 : -1));
+            currentSlideTilt = Mathf.Clamp01(currentSlideTilt + Time.fixedDeltaTime * slideTiltSpeed * (sliding ? 1 : -1));
             if (capsuleHeight.Value != capsule.height && capsuleCentre.Value != capsule.center.y) {
                 capsuleHeight.Value = capsule.height;
                 capsuleCentre.Value = capsule.center.y;
