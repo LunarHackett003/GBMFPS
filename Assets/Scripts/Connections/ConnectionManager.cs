@@ -134,8 +134,8 @@ namespace Starlight.Connection
             }
             finally
             {
-                CreateGame();
-
+                if(!inGame)
+                    CreateGame();
             }
 
             InputHandler.instance.joinCodeDisplay.text = gameLobby.LobbyCode;
