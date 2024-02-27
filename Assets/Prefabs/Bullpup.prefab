@@ -9,6 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8661889632648342554}
+  - component: {fileID: 331389679283838355}
   m_Layer: 0
   m_Name: Bullpup
   m_TagString: Untagged
@@ -32,6 +33,27 @@ Transform:
   - {fileID: 8375013279826177756}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &331389679283838355
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3107241614668812814}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  GlobalObjectIdHash: 1884090234
+  InScenePlacedSourceGlobalObjectIdHash: 0
+  AlwaysReplicateAsRoot: 0
+  SynchronizeTransform: 1
+  ActiveSceneSynchronization: 0
+  SceneMigrationSynchronization: 1
+  SpawnWithObservers: 1
+  DontDestroyWithOwner: 0
+  AutoObjectParentSync: 1
 --- !u!1001 &8336373234602248503
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -58,7 +80,7 @@ PrefabInstance:
     - target: {fileID: -8679921383154817045, guid: d741dba88beb49240acebbc2f153d7f1,
         type: 3}
       propertyPath: m_LocalRotation.w
-      value: 1
+      value: 0.0000008940697
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: d741dba88beb49240acebbc2f153d7f1,
         type: 3}
@@ -68,7 +90,7 @@ PrefabInstance:
     - target: {fileID: -8679921383154817045, guid: d741dba88beb49240acebbc2f153d7f1,
         type: 3}
       propertyPath: m_LocalRotation.y
-      value: -0
+      value: -1
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: d741dba88beb49240acebbc2f153d7f1,
         type: 3}
@@ -83,7 +105,7 @@ PrefabInstance:
     - target: {fileID: -8679921383154817045, guid: d741dba88beb49240acebbc2f153d7f1,
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
+      value: -180
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: d741dba88beb49240acebbc2f153d7f1,
         type: 3}

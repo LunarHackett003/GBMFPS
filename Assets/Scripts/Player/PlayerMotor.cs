@@ -7,6 +7,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace Starlight.Player
 {
@@ -19,6 +20,7 @@ namespace Starlight.Player
         [SerializeField] internal Rigidbody rb;
 
         [SerializeField, Header("Aim")] internal Vector2 lookAngle;
+        [SerializeField, Tooltip("LookAngle offset to counter non-identity IK rotation")] internal Vector2 lookAngleOffset;
         [SerializeField]internal Vector2 lookPitchClamp;
         [SerializeField] internal Vector2 aimRecoilInfluence;
 
@@ -125,32 +127,33 @@ namespace Starlight.Player
         [SerializeField] bool crouchpressed = false;
         bool sprintpressed = false;
 
-        private void OnLevelWasLoaded(int level)
+        public override void OnNetworkSpawn()
+        {
+            isNotMine = !IsOwner;
+            if (IsOwner)
+            {
+                SceneManager.sceneLoaded += SceneManager_sceneLoaded;
+                InputHandler.instance.Unpause();
+            }
+            else
+            {
+                playerCam.enabled = false;
+                foreach (var item in transform.GetComponentsInChildren<Transform>())
+                {
+                    item.gameObject.layer = LayerMask.NameToLayer(ConnectionManager.Instance.remotePlayerLayer);
+                }
+            }
+
+            base.OnNetworkSpawn();
+        }
+
+        private void SceneManager_sceneLoaded(Scene arg0, LoadSceneMode arg1)
         {
             if (IsOwner)
             {
                 var sgd = FindAnyObjectByType<SceneGameData>();
                 transform.position = sgd.spawnPoints[Random.Range(0, sgd.spawnPoints.Count)].position;
             }
-        }
-
-        public override void OnNetworkSpawn()
-        {
-            isNotMine = !IsOwner;
-            if (IsOwner)
-            {
-
-            }
-            else
-            {
-                playerCam.enabled = false;
-                foreach (var item in transform.GetComponentsInChildren<GameObject>())
-                {
-                    item.layer = LayerMask.NameToLayer(ConnectionManager.Instance.remotePlayerLayer);
-                }
-            }
-
-            base.OnNetworkSpawn();
         }
 
         void ViewDynamics()
@@ -380,9 +383,15 @@ namespace Starlight.Player
         {
 
             playerCam.m_Lens.FieldOfView = Mathf.Lerp(focusFOV.x + Mathf.Lerp(0, slideAdditiveFOV, currentSlideTilt), focusFOV.y, currentFocus);
-            focusPositionReceiver.position = Vector3.Lerp(focusPositionReceiver.parent.position, focusPositionTarget.position, currentFocus);
-            focusPositionReceiver.localPosition -= currBobPos + currentAimSwayPos;
-
+            if (focusPositionTarget)
+            {
+                focusPositionReceiver.position = Vector3.Lerp(focusPositionReceiver.parent.position, focusPositionTarget.position, currentFocus);
+                focusPositionReceiver.localPosition -= currBobPos + currentAimSwayPos;
+            }
+            else
+            {
+                focusPositionReceiver.localPosition = -(currBobPos + currentAimSwayPos);
+            }
         }
         void CheckGround()
         {
@@ -586,7 +595,8 @@ namespace Starlight.Player
                     jumpVec = transform.TransformDirection(new Vector3(movementDamped.x * jumpLateralForce, jumpUpwardForce, movementDamped.y * jumpLateralForce));
                     break;
                 case MovementState.wallriding:
-                    jumpVec = (currentWallNormal + Vector3.up + playerCam.transform.forward).normalized * wallrideJumpForce;
+                    
+                    jumpVec = (currentWallNormal + Vector3.up + (wallrideSide == WallrideSide.front ? Vector3.zero : playerCam.transform.forward)).normalized * wallrideJumpForce;
                     StartCoroutine(WallrideDelay(wallrideReEnableTime));
                     isWallriding = false;
                     break;

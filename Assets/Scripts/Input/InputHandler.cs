@@ -170,7 +170,7 @@ namespace Starlight.InputHandling
         void TogglePause()
         {
             paused = !paused;
-            Cursor.lockState = paused ? CursorLockMode.Confined : CursorLockMode.Locked;
+            Cursor.lockState = paused ? CursorLockMode.None : CursorLockMode.Locked;
             Cursor.visible = paused;
             pauseMenu.SetActive(paused);
         }
@@ -194,7 +194,10 @@ namespace Starlight.InputHandling
         public void TryQuitGame()
         {
             ConnectionManager.Instance.TryQuitGame();
-            Unpause();
+            pauseMenu.SetActive(false);
+            paused = false;
+            Cursor.lockState = CursorLockMode.None;
+            Cursor.visible = true;
         }
     }
 }

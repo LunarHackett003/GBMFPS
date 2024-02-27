@@ -85,8 +85,8 @@ namespace Starlight.Connection
                     NetworkManager.Singleton.SceneManager.LoadScene(maps[mapIndex].Name, LoadSceneMode.Single);
                     hostAllocation = alloc;
                     gameLobby = lobby;
-                    inGame = true;
                     InputHandler.instance.joinCodeDisplay.text = lobby.LobbyCode;
+                    inGame = true;
                 }
                 catch (System.Exception)
                 {
