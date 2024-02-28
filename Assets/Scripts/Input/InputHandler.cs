@@ -1,7 +1,5 @@
 using Starlight.Connection;
 using Starlight.PlayerInteraction;
-using System.Collections;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using TMPro;
@@ -19,7 +17,7 @@ namespace Starlight.InputHandling
         internal static InputHandler instance;
         [SerializeField] internal PlayerInput input;
         [SerializeField] internal Vector2 moveVec, lookVec;
-        [SerializeField] internal bool jumpInput, focusInput, fireInput, sprintInput, crouchInput;
+        [SerializeField] internal bool jumpInput, focusInput, fireInput, sprintInput, crouchInput, meleeInput;
         [SerializeField] internal bool holdCrouch;
         [SerializeField] internal bool forwardToMantle;
         internal float moveMagnitude;
@@ -93,7 +91,7 @@ namespace Starlight.InputHandling
         }
         private void FixedUpdate()
         {
-            if (!ConnectionManager.Instance.inGame)
+            if (!(ConnectionManager.Instance && ConnectionManager.Instance.inGame))
             {
                 Cursor.visible = true;
                 Cursor.lockState = CursorLockMode.Confined;
@@ -166,6 +164,10 @@ namespace Starlight.InputHandling
             {
                 TogglePause();
             }
+        }
+        public void GetMeleeInput(InputAction.CallbackContext context)
+        {
+            meleeInput = context.performed || context.started;
         }
         void TogglePause()
         {

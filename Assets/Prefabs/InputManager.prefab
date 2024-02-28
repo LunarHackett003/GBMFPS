@@ -903,6 +903,7 @@ MonoBehaviour:
   fireInput: 0
   sprintInput: 0
   crouchInput: 0
+  meleeInput: 0
   holdCrouch: 0
   forwardToMantle: 0
   lookSpeed: {x: 15, y: -15}
@@ -972,7 +973,19 @@ MonoBehaviour:
     m_ActionId: 8f6ee5a1-29f5-48f4-abbd-b16292f85c26
     m_ActionName: 'Player/Look[/Mouse/delta,/Pen/delta]'
   - m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 5521410442011826548}
+        m_TargetAssemblyTypeName: Starlight.InputHandling.InputHandler, Assembly-CSharp
+        m_MethodName: GetFireInput
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
     m_ActionId: ef1be626-e040-4d63-a0b4-cd271782b81f
     m_ActionName: 'Player/Fire[/Mouse/leftButton]'
   - m_PersistentCalls:
@@ -1111,6 +1124,22 @@ MonoBehaviour:
         m_CallState: 2
     m_ActionId: c2f75134-764f-41ac-800e-c53fcdc37819
     m_ActionName: 'Player/PauseInput[/Keyboard/escape]'
+  - m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 5521410442011826548}
+        m_TargetAssemblyTypeName: Starlight.InputHandling.InputHandler, Assembly-CSharp
+        m_MethodName: GetMeleeInput
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+    m_ActionId: 070d7760-e718-4c4d-9c1a-3641caaeb77b
+    m_ActionName: 'Player/Melee[/Keyboard/v]'
   m_NeverAutoSwitchControlSchemes: 0
   m_DefaultControlScheme: 
   m_DefaultActionMap: Player
@@ -1648,7 +1677,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &7744602219451377396
 RectTransform:
   m_ObjectHideFlags: 0
@@ -2188,7 +2217,7 @@ RectTransform:
   m_Father: {fileID: 2327056639940523649}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 10, y: -20}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -2638,7 +2667,7 @@ RectTransform:
   m_Father: {fileID: 5399504173285771386}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 10, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -2713,7 +2742,7 @@ RectTransform:
   m_Father: {fileID: 1092088976732821238}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 10, y: -20}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -2921,7 +2950,7 @@ RectTransform:
   m_Father: {fileID: 5639388204079986715}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 10, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}

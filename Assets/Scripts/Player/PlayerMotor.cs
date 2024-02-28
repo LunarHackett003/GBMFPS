@@ -1,5 +1,6 @@
 using Cinemachine;
 using Cinemachine.Utility;
+using Starlight.Animation;
 using Starlight.Connection;
 using Starlight.Data;
 using Starlight.InputHandling;
@@ -18,6 +19,7 @@ namespace Starlight.Player
         [SerializeField] internal Transform head, focusPositionReceiver, focusPositionTarget, swayTransform, aimRotationTransform, aimRotationAnchor;
 
         [SerializeField] internal Rigidbody rb;
+        [SerializeField] internal AnimationManager animationManager;
 
         [SerializeField, Header("Aim")] internal Vector2 lookAngle;
         [SerializeField, Tooltip("LookAngle offset to counter non-identity IK rotation")] internal Vector2 lookAngleOffset;
@@ -126,7 +128,7 @@ namespace Starlight.Player
         bool jumppressed = false;
         [SerializeField] bool crouchpressed = false;
         bool sprintpressed = false;
-
+        bool meleePressed = false;
         public override void OnNetworkSpawn()
         {
             isNotMine = !IsOwner;
@@ -193,7 +195,7 @@ namespace Starlight.Player
             aimRecoilInfluence = currentRecoilRot * aimRecoilInfluence;
             lookAngle.y = Mathf.Clamp(lookAngle.y + aimRecoilInfluence.x, lookPitchClamp.x, lookPitchClamp.y);
             lookAngleDelta = (oldLookAngle - lookAngle);
-            aimRotationTransform.localRotation = Quaternion.Euler(lookAngle.y, aimRecoilInfluence.y, Mathf.Lerp(0, slideTilt, currentSlideTilt));
+            aimRotationTransform.localRotation = Quaternion.Euler(lookAngle.y + lookAngleOffset.y, aimRecoilInfluence.y, Mathf.Lerp(0, slideTilt, currentSlideTilt));
             transform.localRotation = Quaternion.Euler(0, lookAngle.x, 0);
             lookAngle.x %= 360;
             oldLookAngle = lookAngle;
@@ -226,6 +228,7 @@ namespace Starlight.Player
             //Are we sprinting?
             sprinting = InputHandler.instance.sprintInput && moveState == MovementState.onFoot;
             //Are we crouching?
+
             if (InputHandler.instance.holdCrouch)
             {
                 crouching = InputHandler.instance.crouchInput;
@@ -249,7 +252,7 @@ namespace Starlight.Player
 
             currentFocus += Time.fixedDeltaTime * focusSpeed * (InputHandler.instance.focusInput ? 1 : -1);
             currentFocus = Mathf.Clamp01(currentFocus);
-
+            
             if (InputHandler.instance.focusInput)
                 sprinting = false;
             if (!sliding)
