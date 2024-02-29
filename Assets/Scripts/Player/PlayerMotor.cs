@@ -4,6 +4,7 @@ using Starlight.Animation;
 using Starlight.Connection;
 using Starlight.Data;
 using Starlight.InputHandling;
+using Starlight.Weapons;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.Netcode;
@@ -129,6 +130,7 @@ namespace Starlight.Player
         [SerializeField] bool crouchpressed = false;
         bool sprintpressed = false;
         bool meleePressed = false;
+        [SerializeField] internal WeaponManager wm;
         public override void OnNetworkSpawn()
         {
             isNotMine = !IsOwner;
@@ -146,6 +148,7 @@ namespace Starlight.Player
                 }
             }
 
+            wm = GetComponent<WeaponManager>();
             base.OnNetworkSpawn();
         }
 

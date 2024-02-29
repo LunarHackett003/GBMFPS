@@ -558,6 +558,7 @@ MonoBehaviour:
   capsuleCentre:
     m_InternalValue: 0
   crouchpressed: 0
+  wm: {fileID: 0}
 --- !u!54 &6638729253471829717
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -642,6 +643,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   animator: {fileID: 4720585404491581099}
   pm: {fileID: 444294740788997832}
+  controller: {fileID: 0}
+  defaultAnimations: []
 --- !u!114 &6828141754842652455
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -661,6 +664,12 @@ MonoBehaviour:
   meleeBounds: {x: 0.65, y: 0.59, z: 0.14}
   meleeBoxcastDistance: 0.75
   meleeDamage: 50
+  currentSlot: 0
+  currentEquippable: {fileID: 0}
+  equippables: []
+  equippableIndex: 0
+  netEquipIndex:
+    m_InternalValue: 0
 --- !u!1 &993850962100849162
 GameObject:
   m_ObjectHideFlags: 0

@@ -16,5 +16,9 @@ namespace Starlight.Animation
         {
             wm.Melee();
         }
+        public void WeaponSwitch()
+        {
+            wm.WeaponSwitchAnimationCallback();
+        }
     }
 }

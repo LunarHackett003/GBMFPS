@@ -21,7 +21,7 @@ namespace Starlight
             entity.TakeDamage(damageIn * damageMultiplier);
             if (entity.applyForce)
             {
-                entity.rb.AddForceAtPosition((transform.position - damageOrigin) * damageIn * damageMultiplier * entity.forceInMultiplier, transform.position);
+                entity.rb.AddForceAtPosition(damageIn * damageMultiplier * entity.forceInMultiplier * (transform.position - damageOrigin), transform.position);
             }
         }
     }

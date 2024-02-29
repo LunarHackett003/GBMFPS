@@ -17,7 +17,7 @@ namespace Starlight.InputHandling
         internal static InputHandler instance;
         [SerializeField] internal PlayerInput input;
         [SerializeField] internal Vector2 moveVec, lookVec;
-        [SerializeField] internal bool jumpInput, focusInput, fireInput, sprintInput, crouchInput, meleeInput;
+        [SerializeField] internal bool jumpInput, focusInput, fireInput, sprintInput, crouchInput, meleeInput, grenadeInput, tacticalInput;
         [SerializeField] internal bool holdCrouch;
         [SerializeField] internal bool forwardToMantle;
         internal float moveMagnitude;
@@ -168,6 +168,15 @@ namespace Starlight.InputHandling
         public void GetMeleeInput(InputAction.CallbackContext context)
         {
             meleeInput = context.performed || context.started;
+        }
+
+        public void GetGrenadeInput(InputAction.CallbackContext context)
+        {
+            grenadeInput = context.performed || context.started;
+        }
+        public void GetTacticalInput(InputAction.CallbackContext context)
+        {
+            tacticalInput = context.performed || context.started;
         }
         void TogglePause()
         {
